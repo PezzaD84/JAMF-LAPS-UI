@@ -23,7 +23,65 @@
 # $4: JSS URL
 # $5: Encoded API Credentials
 #
-############################################################################
+#########################################################################################
+
+##############################################################
+# Functions
+##############################################################
+
+DialogInstall(){
+	
+	pkgfile="SwiftDialog.pkg"
+	logfile="/Library/Logs/SwiftDialogInstallScript.log"
+	URL="https://github.com$(curl -sfL "$(curl -sfL "https://github.com/bartreardon/swiftDialog/releases/latest" | tr '"' "\n" | grep -i "expanded_assets" | head -1)" | tr '"' "\n" | grep -i "^/.*\/releases\/download\/.*\.pkg" | head -1)"
+	
+	# Start Log entries
+	echo "--" >> ${logfile}
+	echo "`date`: Downloading latest version." >> ${logfile}
+	
+	# Download installer
+	curl -s -L -J -o /tmp/${pkgfile} ${URL}
+	echo "`date`: Installing..." >> ${logfile}
+	
+	# Change to installer directory
+	cd /tmp
+	
+	# Install application
+	sudo installer -pkg ${pkgfile} -target /
+	sleep 5
+	echo "`date`: Deleting package installer." >> ${logfile}
+	
+	# Remove downloaded installer
+	rm /tmp/"${pkgfile}"
+	
+}
+
+##############################################################
+# Check if SwiftDialog is installed (SwiftDialog created by Bart Reardon https://github.com/bartreardon/swiftDialog)
+##############################################################
+
+if ! command -v dialog &> /dev/null
+then
+	echo "SwiftDialog is not installed. App will be installed now....."
+	sleep 2
+	
+	DialogInstall
+	
+else
+	echo "SwiftDialog is installed. Checking installed version....."
+	
+	installedVersion=$(dialog -v | sed 's/./ /6' | awk '{print $1}')
+	
+	latestVersion=$(curl -sfL "https://github.com/bartreardon/swiftDialog/releases/latest" | tr '"' "\n" | grep -i "expanded_assets" | head -1 | tr '/' ' ' | awk '{print $7}' | tr -d 'v')
+	
+	if [[ $installedVersion != $latestVersion ]]; then
+		echo "Dialog needs updating"
+		DialogInstall
+	else
+		echo "Dialog is up to date. Continuing to assemble...."
+	fi
+	sleep 3
+fi
 
 # Get Bearer token
 URL="$4"
