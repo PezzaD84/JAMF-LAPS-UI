@@ -34,7 +34,7 @@ token=$(curl -s -H "Content-Type: application/json" -H "Authorization: Basic ${p
 # Get Device name
 message=$(dialog \
 --title "JAMF LAPS UI" \
---icon "/Library/.LAPS/Branding/Icons/lock icon.png" --iconsize 100 \
+--icon "https://github.com/PezzaD84/JAMF-LAPS-UI/blob/main/lock%20icon.png?raw=true" --iconsize 100 \
 --message "Please enter the name of the device you wish to see the LAPS password for. \n\n You must also provide a reason for viewing the LAPS Password for auditing." \
 --messagefont "name=Arial,size=17" \
 --button1text "Continue" \
@@ -70,7 +70,7 @@ PASSWD=$(curl -s -X "GET" "$URL/api/v2/local-admin-password/$MANAGEID/account/$L
 # View LAPS Account and Password
 dialog \
 --title "JAMF LAPS UI" \
---icon "/Library/.LAPS/Branding/Icons/Open Lock Icon.png" --iconsize 100 \
+--icon "https://github.com/PezzaD84/JAMF-LAPS-UI/blob/main/Open%20Lock%20Icon.png?raw=true" --iconsize 100 \
 --message "The JAMF LAPS Account details for $name are:  \n\n Username: $LAPSUSER  \n Password: $PASSWD \n\n This message will close after 10seconds." \
 --messagefont "name=Arial,size=17" \
 --timer \
