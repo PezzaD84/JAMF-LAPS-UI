@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+# Author  : Perry Driscoll - https://github.com/PezzaD84
+# Created : 11/8/2023
+# Updated : 11/8/2023
+# Version : v0.1
+#
+#########################################################################################
+# Description:
+#	Script to display the JAMF LAPS account and password
+#
+#########################################################################################
+# Copyright © 2023 Perry Driscoll <https://github.com/PezzaD84>
+#
+# This file is free software and is shared "as is" without any warranty of 
+# any kind. The author gives unlimited permission to copy and/or distribute 
+# it, with or without modifications, as long as this notice is preserved. 
+# All usage is at your own risk and in no event shall the authors or 
+# copyright holders be liable for any claim, damages or other liability.
+#########################################################################################
+#
+# JAMF Script Variables
+# $4: JSS URL
+# $5: Encoded API Credentials
+#
+############################################################################
+
+# Get Bearer token
+URL="$4"
+password="$5"
+
+token=$(curl -s -H "Content-Type: application/json" -H "Authorization: Basic ${password}" -X POST "$URL/api/v1/auth/token" | plutil -extract token raw -)
+
+# Get Device name
+message=$(dialog \
+--title "JAMF LAPS UI" \
+--icon "/Library/.LAPS/Branding/Icons/lock icon.png" --iconsize 100 \
+--message "Please enter the name of the device you wish to see the LAPS password for. \n\n You must also provide a reason for viewing the LAPS Password for auditing." \
+--messagefont "name=Arial,size=17" \
+--button1text "Continue" \
+--button2text "Quit" \
+--textfield "Device name,required" \
+--textfield "Reason,required" \
+--ontop \
+--regular \
+--json \
+--moveable
+)
+		
+name=$(echo $message | awk -F '"Device name" : "' '{print$2}' | awk -F '"' '{print$1}')
+reason=$(echo $message | awk -F '"Reason" : "' '{print$2}' | awk -F '"' '{print$1}') # Thanks to ons-mart https://github.com/ons-mart
+		
+if [[ $name == "" ]] || [[ $reason == "" ]]; then
+	echo "Aborting"
+	exit 1
+fi
+
+# Get Device ID
+ID=$(curl -s -X GET "$URL/JSSResource/computers/name/$name" -H 'Accept: application/json' -H "Authorization:Bearer ${token}" | plutil -extract "computer"."general"."id" raw -)
+
+# Get JAMF Management ID
+MANAGEID=$(curl -s -X "GET" "$URL/api/v1/computers-inventory-detail/$ID" -H "Accept: application/json" -H "Authorization:Bearer ${token}" | plutil -extract "general"."managementId" raw -)
+
+# Get LAPS Username
+LAPSUSER=$(curl -s -X "GET" "$URL/api/v2/local-admin-password/$MANAGEID/accounts" -H "Accept: application/json" -H "Authorization:Bearer ${token}" | plutil -extract "results".0."username" raw -)
+
+# Get Password
+PASSWD=$(curl -s -X "GET" "$URL/api/v2/local-admin-password/$MANAGEID/account/$LAPSUSER/password" -H "Accept: application/json" -H "Authorization:Bearer ${token}" | plutil -extract password raw -)
+
+# View LAPS Account and Password
+dialog \
+--title "JAMF LAPS UI" \
+--icon "/Library/.LAPS/Branding/Icons/Open Lock Icon.png" --iconsize 100 \
+--message "The JAMF LAPS Account details for $name are:  \n\n Username: $LAPSUSER  \n Password: $PASSWD \n\n This message will close after 10seconds." \
+--messagefont "name=Arial,size=17" \
+--timer \
+--ontop \
+--moveable
