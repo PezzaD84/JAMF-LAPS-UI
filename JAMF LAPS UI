@@ -131,7 +131,7 @@ PASSWD=$(curl -s -X "GET" "$URL/api/v2/local-admin-password/$MANAGEID/account/$L
 dialog \
 --title "JAMF LAPS UI" \
 --icon "https://github.com/PezzaD84/JAMF-LAPS-UI/blob/main/Open%20Lock%20Icon.png?raw=true" --iconsize 100 \
---message "The JAMF LAPS Account details for $name are:  \n\n Username: $LAPSUSER  \n Password: $PASSWD \n\n This message will close after 10seconds." \
+--message "The JAMF LAPS Account details for $name1 are:  \n\n Username: $LAPSUSER  \n Password: $PASSWD \n\n This message will close after 10seconds." \
 --messagefont "name=Arial,size=17" \
 --timer \
 --ontop \
