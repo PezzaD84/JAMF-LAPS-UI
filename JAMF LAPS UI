@@ -2,7 +2,7 @@
 #
 # Author  : Perry Driscoll - https://github.com/PezzaD84
 # Created : 11/8/2023
-# Updated : 11/8/2023
+# Updated : 25/9/2023
 # Version : v0.1
 #
 #########################################################################################
@@ -112,6 +112,8 @@ if [[ $name == "" ]] || [[ $reason == "" ]]; then
 	echo "Aborting"
 	exit 1
 fi
+
+name=$(echo $name | sed -e 's#’#%E2%80%99#g' -e 's# #%20#g')
 
 # Get Device ID
 ID=$(curl -s -X GET "$URL/JSSResource/computers/name/$name" -H 'Accept: application/json' -H "Authorization:Bearer ${token}" | plutil -extract "computer"."general"."id" raw -)
