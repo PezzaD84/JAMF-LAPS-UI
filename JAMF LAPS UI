@@ -105,7 +105,7 @@ message=$(dialog \
 --moveable
 )
 		
-name=$(echo $message | awk -F '"Device name" : "' '{print$2}' | awk -F '"' '{print$1}')
+name1=$(echo $message | awk -F '"Device name" : "' '{print$2}' | awk -F '"' '{print$1}')
 reason=$(echo $message | awk -F '"Reason" : "' '{print$2}' | awk -F '"' '{print$1}') # Thanks to ons-mart https://github.com/ons-mart
 		
 if [[ $name == "" ]] || [[ $reason == "" ]]; then
@@ -113,7 +113,7 @@ if [[ $name == "" ]] || [[ $reason == "" ]]; then
 	exit 1
 fi
 
-name=$(echo $name | sed -e 's#’#%E2%80%99#g' -e 's# #%20#g')
+name=$(echo $name1 | sed -e 's#’#%E2%80%99#g' -e 's# #%20#g')
 
 # Get Device ID
 ID=$(curl -s -X GET "$URL/JSSResource/computers/name/$name" -H 'Accept: application/json' -H "Authorization:Bearer ${token}" | plutil -extract "computer"."general"."id" raw -)
