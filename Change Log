@@ -1,0 +1,6 @@
+Change log of feature updates and improvments
+
+# JAMF LAPS UI - v0.2
+
+## Ability to handle special characters in device name
+    If a device name has spaces or special characters these are now passed through to the API URL in the correct format. For example a blank space is replaced with %20
