@@ -108,7 +108,7 @@ message=$(dialog \
 name1=$(echo $message | awk -F '"Device name" : "' '{print$2}' | awk -F '"' '{print$1}')
 reason=$(echo $message | awk -F '"Reason" : "' '{print$2}' | awk -F '"' '{print$1}') # Thanks to ons-mart https://github.com/ons-mart
 		
-if [[ $name == "" ]] || [[ $reason == "" ]]; then
+if [[ $name1 == "" ]] || [[ $reason == "" ]]; then
 	echo "Aborting"
 	exit 1
 fi
