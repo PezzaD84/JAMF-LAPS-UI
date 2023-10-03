@@ -89,7 +89,7 @@ else
 		echo "Dialog needs updating"
 		DialogInstall
 	else
-		echo "Dialog is up to date. Continuing to assemble...."
+		echo "Dialog is up to date. Continuing...."
 	fi
 	sleep 3
 fi
