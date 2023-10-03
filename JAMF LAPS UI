@@ -2,8 +2,8 @@
 #
 # Author  : Perry Driscoll - https://github.com/PezzaD84
 # Created : 11/8/2023
-# Updated : 25/9/2023
-# Version : v0.2
+# Updated : 3/10/2023
+# Version : v1
 #
 #########################################################################################
 # Description:
@@ -22,8 +22,19 @@
 # JAMF Script Variables
 # $4: JSS URL
 # $5: Encoded API Credentials
+# $6: Slack URL
+# $7: Teams URL
+# $8: Service Desk URL
 #
 #########################################################################################
+
+############################################################################
+# Variables
+############################################################################
+
+CURRENT_USER=$(ls -l /dev/console | awk '{ print $3 }')
+DEVICE=`hostname`
+SERVICEDESK=$8
 
 ##############################################################
 # Functions
@@ -83,29 +94,40 @@ else
 	sleep 3
 fi
 
+############################################################################
+# API Credentials
+############################################################################
+
 # Get Bearer token
 URL="$4"
 password="$5"
 
 token=$(curl -s -H "Content-Type: application/json" -H "Authorization: Basic ${password}" -X POST "$URL/api/v1/auth/token" | plutil -extract token raw -)
 
-# Get Device name
+############################################################################
+# Pop up for Device name
+############################################################################
+
 message=$(dialog \
 --title "JAMF LAPS UI" \
 --icon "https://github.com/PezzaD84/JAMF-LAPS-UI/blob/main/lock%20icon.png?raw=true" --iconsize 100 \
---message "Please enter the name of the device you wish to see the LAPS password for. \n\n You must also provide a reason for viewing the LAPS Password for auditing." \
+--message "Please enter the name or serial of the device you wish to see the LAPS password for. \n\n You must also provide a reason for viewing the LAPS Password for auditing." \
 --messagefont "name=Arial,size=17" \
 --button1text "Continue" \
 --button2text "Quit" \
---textfield "Device name,required" \
+--textfield "Device,required" \
 --textfield "Reason,required" \
+--selecttitle "Serial or Hostname",required \
+--selectvalues "Serial Number,Hostname" \
+--selectdefault "Hostname" \
 --ontop \
 --regular \
 --json \
 --moveable
 )
-		
-name1=$(echo $message | awk -F '"Device name" : "' '{print$2}' | awk -F '"' '{print$1}')
+	
+DROPDOWN=$(echo $message | awk -F '"SelectedOption" : "' '{print$2}' | awk -F '"' '{print$1}')	
+name1=$(echo $message | awk -F '"Device" : "' '{print$2}' | awk -F '"' '{print$1}')
 reason=$(echo $message | awk -F '"Reason" : "' '{print$2}' | awk -F '"' '{print$1}') # Thanks to ons-mart https://github.com/ons-mart
 		
 if [[ $name1 == "" ]] || [[ $reason == "" ]]; then
@@ -113,21 +135,46 @@ if [[ $name1 == "" ]] || [[ $reason == "" ]]; then
 	exit 1
 fi
 
-name=$(echo $name1 | sed -e 's#’#%E2%80%99#g' -e 's# #%20#g')
-
+############################################################################
 # Get Device ID
-ID=$(curl -s -X GET "$URL/JSSResource/computers/name/$name" -H 'Accept: application/json' -H "Authorization:Bearer ${token}" | plutil -extract "computer"."general"."id" raw -)
+############################################################################
 
+if [[ $DROPDOWN == "Hostname" ]]; then 
+	echo "User selected Hostname"
+		
+	name=$(echo $name1 | sed -e 's#’#%E2%80%99#g' -e 's# #%20#g')
+
+	# Get Device ID
+	ID=$(curl -s -X GET "$URL/JSSResource/computers/name/$name" -H 'Accept: application/json' -H "Authorization:Bearer ${token}" | plutil -extract "computer"."general"."id" raw -)
+else
+	echo "User selected Serial"
+	
+	# Get Device ID
+	ID=$(curl -s -X GET "$URL/JSSResource/computers/serialnumber/$name1" -H 'Accept: application/json' -H "Authorization:Bearer ${token}" | plutil -extract "computer"."general"."id" raw -)
+fi
+
+############################################################################
 # Get JAMF Management ID
+############################################################################
+	
 MANAGEID=$(curl -s -X "GET" "$URL/api/v1/computers-inventory-detail/$ID" -H "Accept: application/json" -H "Authorization:Bearer ${token}" | plutil -extract "general"."managementId" raw -)
 
+############################################################################
 # Get LAPS Username
+############################################################################
+	
 LAPSUSER=$(curl -s -X "GET" "$URL/api/v2/local-admin-password/$MANAGEID/accounts" -H "Accept: application/json" -H "Authorization:Bearer ${token}" | plutil -extract "results".0."username" raw -)
 
+############################################################################
 # Get Password
+############################################################################
+	
 PASSWD=$(curl -s -X "GET" "$URL/api/v2/local-admin-password/$MANAGEID/account/$LAPSUSER/password" -H "Accept: application/json" -H "Authorization:Bearer ${token}" | plutil -extract password raw -)
 
+############################################################################
 # View LAPS Account and Password
+############################################################################
+
 dialog \
 --title "JAMF LAPS UI" \
 --icon "https://github.com/PezzaD84/JAMF-LAPS-UI/blob/main/Open%20Lock%20Icon.png?raw=true" --iconsize 100 \
@@ -136,3 +183,113 @@ dialog \
 --timer \
 --ontop \
 --moveable
+
+############################################################################
+# Slack notification
+############################################################################
+	
+	if [[ $6 == "" ]]; then
+		echo "No slack URL configured"
+	else
+		if [[ $SERVICEDESK == "" ]]; then
+			SERVICEDESK="https://www.slack.com"
+		fi
+		echo "Sending Slack WebHook"
+		curl -s -X POST -H 'Content-type: application/json' \
+		-d \
+		'{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "JAMF LAPS Password Requested:closed_lock_with_key:",
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": ">*Device Name:*\n>'"$name1"'"
+				},
+				{
+					"type": "mrkdwn",
+					"text": ">*Requested by:*\n>'"$CURRENT_USER"' on '"$DEVICE"'"
+				},
+				{
+					"type": "mrkdwn",
+					"text": ">*Reason for Request:*\n>'"$reason"'"
+				},
+			]
+		},
+		{
+		"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Challenge Request",
+						"emoji": true
+					},
+					"style": "danger",
+					"action_id": "actionId-0",
+					"url": "'"$SERVICEDESK"'"
+				}
+			]
+		}
+	]
+}' \
+$6
+fi
+	
+############################################################################
+# Teams notification (Credit to https://github.com/nirvanaboi10 for the Teams code)
+############################################################################
+	
+	if [[ $7 == "" ]]; then
+		echo "No teams Webhook configured"
+	else
+		if [[ $SERVICEDESK == "" ]]; then
+			SERVICEDESK="https://www.microsoft.com/en-us/microsoft-teams/"
+		fi
+		echo "Sending Teams WebHook"
+		jsonPayload='{
+	"@type": "MessageCard",
+	"@context": "http://schema.org/extensions",
+	"themeColor": "0076D7",
+	"summary": "Admin has been used",
+	"sections": [{
+		"activityTitle": "JAMF LAPS Password Requested",
+		"activityImage": "https://raw.githubusercontent.com/PezzaD84/macOSLAPS/main/Icons/Open%20Lock%20Icon.png",
+		"facts": [{
+			"name": "Device Name:",
+			"value": "'"$name1"'"
+		}, {
+			"name": "Requested by:",
+			"value": "'"$CURRENT_USER"' on '"$DEVICE"'"
+		}, {
+			"name": "Reason",
+			"value": "'"$reason"'"
+		}],
+		"markdown": true
+	}],
+	"potentialAction": [{
+		"@type": "OpenUri",
+		"name": "Challenge Request",
+		"targets": [{
+			"os": "default",
+			"uri":
+			"'"$SERVICEDESK"'"
+		}]
+	}]
+}'
+		
+# Send the JSON payload using curl
+curl -s -X POST -H "Content-Type: application/json" -d "$jsonPayload" "$7"
+fi
+	
