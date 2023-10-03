@@ -1,5 +1,16 @@
 Change log of feature updates and improvments
 
+# JAMF LAPS UI - v1
+
+## Teams Integration added
+    Support for Teams webhooks has now been added and notification can be sent to either Teams, Slack or both.
+## Slack Integration added
+    Support for Slack webhooks has now been added and notification can be sent to either Slack, Teams or both.
+## Support for device names with special charaters
+    Support has been added for device names with spaces and special characters. For example a space in a name with now be changed to %20
+## View the password via Hostname or Serial number
+    Support has been added to retrive the LAPS password using either the serial number or Hostname of the device.
+
 # JAMF LAPS UI - v0.2
 
 ## Ability to handle special characters in device name
