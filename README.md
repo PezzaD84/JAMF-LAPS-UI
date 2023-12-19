@@ -4,7 +4,7 @@
 # JAMF LAPS UI
 
 A GUI Interface for viewing the JAMF LAPS Password.
-![Screenshot 2023-10-03 at 11 45 56](https://github.com/PezzaD84/JAMF-LAPS-UI/assets/89595349/2f5ffad5-e85d-4c1c-9114-1094a7d5918a)
+![Screenshot 2023-12-19 at 10 37 54](https://github.com/PezzaD84/JAMF-LAPS-UI/assets/89595349/a45a29bd-2eff-4c9b-adb6-85869665546c)
 ![Screenshot 2023-08-14 at 10 30 11](https://github.com/PezzaD84/JAMF-LAPS-UI/assets/89595349/ef86ecff-a6c8-4021-8efa-8aef2e58c461)
 
 Upload the script and create a self service policy. Just input your JAMF URL and your encoded API credentials to get up and running. You can also add a Teams or Slack WebHook URL to add notifications to an admin channel. You can also add a service desk URL to create tickets based off a LAPS request.<br>[Teams WebHook Creation](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook?tabs=dotnet)<br>[Slack WebHook Creation](https://slack.com/intl/en-gb/help/articles/115005265063-Incoming-webhooks-for-Slack)
