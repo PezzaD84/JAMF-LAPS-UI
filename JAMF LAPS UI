@@ -2,8 +2,8 @@
 #
 # Author  : Perry Driscoll - https://github.com/PezzaD84
 # Created : 11/8/2023
-# Updated : 19/12/2023
-# Version : v1.1
+# Updated : 24/7/2024
+# Version : v1.2
 #
 #########################################################################################
 # Description:
@@ -115,6 +115,7 @@ message=$(dialog \
 --messagefont "name=Arial,size=17" \
 --button1text "Continue" \
 --button2text "Quit" \
+--vieworder "dropdown,textfield" \
 --textfield "LAPS Account",prompt="LAPS Account name if known" \
 --textfield "Device,required" \
 --textfield "Reason,required" \
