@@ -12,6 +12,7 @@ Upload the script and create a self service policy. Just input your JAMF URL and
 ![Screenshot 2023-10-03 at 11 10 30](https://github.com/PezzaD84/JAMF-LAPS-UI/assets/89595349/ed2bfa60-5647-41e3-bf97-80ca888fedab)
 
 Permissions for the API account:
+
 **JAMF Pro Server Actions**
 ```
 API Integrations: Create,Read,Update
