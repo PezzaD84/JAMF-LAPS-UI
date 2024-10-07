@@ -1,5 +1,10 @@
 Change log of feature updates and improvments
 
+# JAMF LAPS UI - v1.3
+
+## Debug mode added
+    LAPS UI now supports a debug mode to help troubleshoot issues. This can be found in the JAMF policy log and ocally in /Library/.LAPS/Logs/JAMFLAPS.log
+
 # JAMF LAPS UI - v1
 
 ## Teams Integration added
