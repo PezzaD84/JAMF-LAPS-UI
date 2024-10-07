@@ -2,8 +2,8 @@
 #
 # Author  : Perry Driscoll - https://github.com/PezzaD84
 # Created : 11/8/2023
-# Updated : 24/7/2024
-# Version : v1.2
+# Updated : 7/10/2024
+# Version : v1.3
 #
 #########################################################################################
 # Description:
@@ -29,9 +29,16 @@
 #########################################################################################
 
 ############################################################################
+# Debug Mode - Change to 1 if you wish to run the script in Debug mode
+############################################################################
+
+DEBUG="0"
+
+############################################################################
 # Variables
 ############################################################################
 
+JAMFLAPSLOG="/Library/.LAPS/Logs/JAMFLAPS.log"
 CURRENT_USER=$(ls -l /dev/console | awk '{ print $3 }')
 DEVICE=`hostname`
 SERVICEDESK=$8
@@ -104,6 +111,13 @@ password="$5"
 
 token=$(curl -s -H "Content-Type: application/json" -H "Authorization: Basic ${password}" -X POST "$URL/api/v1/auth/token" | plutil -extract token raw -)
 
+if [[ $DEBUG == "1" ]]; then
+	echo "-----DEBUG MODE ENABLED-----" | tee -a "$JAMFLAPSLOG"
+fi
+if [[ $DEBUG == "1" ]]; then
+	echo "-----DEBUG MODE----- Bearer Token: $token" | tee -a "$JAMFLAPSLOG"
+fi
+
 ############################################################################
 # Pop up for Device name
 ############################################################################
@@ -138,6 +152,13 @@ if [[ $name1 == "" ]] || [[ $reason == "" ]]; then
 	exit 1
 fi
 
+if [[ $DEBUG == "1" ]]; then
+	echo "-----DEBUG MODE----- Device Type: $DROPDOWN" | tee -a "$JAMFLAPSLOG"
+	echo "-----DEBUG MODE----- Device name: $name1" | tee -a "$JAMFLAPSLOG"
+	echo "-----DEBUG MODE----- Viewed Reason: $reason" | tee -a "$JAMFLAPSLOG"
+	echo "-----DEBUG MODE----- LAPS Name: $LAPSname" | tee -a "$JAMFLAPSLOG"
+fi
+	
 ############################################################################
 # Get Device ID
 ############################################################################
@@ -156,12 +177,20 @@ else
 	ID=$(curl -s -X GET "$URL/JSSResource/computers/serialnumber/$name1" -H 'Accept: application/json' -H "Authorization:Bearer ${token}" | plutil -extract "computer"."general"."id" raw -)
 fi
 
+if [[ $DEBUG == "1" ]]; then
+	echo "-----DEBUG MODE----- JAMF ID: $ID" | tee -a "$JAMFLAPSLOG"
+fi
+	
 ############################################################################
 # Get JAMF Management ID
 ############################################################################
 	
 MANAGEID=$(curl -s -X "GET" "$URL/api/v1/computers-inventory-detail/$ID" -H "Accept: application/json" -H "Authorization:Bearer ${token}" | plutil -extract "general"."managementId" raw -)
 
+if [[ $DEBUG == "1" ]]; then
+	echo "-----DEBUG MODE----- Managed ID: $MANAGEID" | tee -a "$JAMFLAPSLOG"
+fi
+	
 ############################################################################
 # Get LAPS Username
 ############################################################################
@@ -183,6 +212,10 @@ else
 	PASSWD=$(curl -s -X "GET" "$URL/api/v2/local-admin-password/$MANAGEID/account/$LAPSUSER/password" -H "Accept: application/json" -H "Authorization:Bearer ${token}" | plutil -extract password raw -)
 fi
 
+if [[ $DEBUG == "1" ]]; then
+	echo "-----DEBUG MODE----- LAPS Account: $LAPSUSER" | tee -a "$JAMFLAPSLOG"
+fi
+	
 ############################################################################
 # View LAPS Account and Password
 ############################################################################
