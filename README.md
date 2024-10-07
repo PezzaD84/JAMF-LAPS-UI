@@ -1,4 +1,4 @@
-[![Latest-Version](https://img.shields.io/badge/Latest_Version-1.1-green)](https://github.com/PezzaD84/macOSLAPS/releases) ![macOS-Versions](https://img.shields.io/badge/macOS-11+-blue) ![Script-Language](https://img.shields.io/badge/Coding_Language-Bash-blue) [![Powered-by](https://img.shields.io/badge/Powered_by-SwiftDialog-red)](https://github.com/bartreardon/swiftDialog)
+[![Latest-Version](https://img.shields.io/badge/Latest_Version-1.3-green)](https://github.com/PezzaD84/macOSLAPS/releases) ![macOS-Versions](https://img.shields.io/badge/macOS-11+-blue) ![Script-Language](https://img.shields.io/badge/Coding_Language-Bash-blue) [![Powered-by](https://img.shields.io/badge/Powered_by-SwiftDialog-red)](https://github.com/bartreardon/swiftDialog)
 
 
 # JAMF LAPS UI
