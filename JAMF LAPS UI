@@ -310,7 +310,7 @@ fi
 	"summary": "Admin has been used",
 	"sections": [{
 		"activityTitle": "JAMF LAPS Password Requested",
-		"activityImage": "https://raw.githubusercontent.com/PezzaD84/macOSLAPS/main/Icons/Open%20Lock%20Icon.png",
+		"activityImage": "https://github.com/PezzaD84/JAMF-LAPS-UI/blob/main/Open%20Lock%20Icon.png?raw=true",
 		"facts": [{
 			"name": "Device Name:",
 			"value": "'"$name1"'"
