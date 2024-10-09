@@ -16,10 +16,8 @@ Permissions for the API account:
 **JAMF Pro Server Actions**
 ```
 API Integrations: Create,Read,Update
-Computer Extension Attributes: Create,Read,Update
-Computers: Create,Read,Update
-User Extension Attributes: Create,Read,Update
-Users: Create,Read,Update
+Computers: Read
+Users: Read
 ```
 **JAMF Pro Server Actions**
 ```
