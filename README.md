@@ -3,7 +3,7 @@
 
 # JAMF LAPS UI
 
-A GUI Interface for viewing the JAMF LAPS Password.
+A GUI Interface for viewing the JAMF LAPS Password. (Credit to [@tempusthales](https://github.com/tempusthales) for the JAMF lock icons)
 ![Screenshot 2023-12-19 at 10 37 54](https://github.com/PezzaD84/JAMF-LAPS-UI/assets/89595349/a45a29bd-2eff-4c9b-adb6-85869665546c)
 ![Screenshot 2023-08-14 at 10 30 11](https://github.com/PezzaD84/JAMF-LAPS-UI/assets/89595349/ef86ecff-a6c8-4021-8efa-8aef2e58c461)
 
